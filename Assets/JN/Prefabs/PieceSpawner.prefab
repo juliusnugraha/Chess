@@ -44,11 +44,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _listPiecePrefab:
-  - {fileID: 196866, guid: a71fd906a2159e247ab4d632e46947db, type: 3}
-  - {fileID: 130826, guid: 861e95a585868b643bf2e4a1d0ae63b7, type: 3}
-  - {fileID: 196802, guid: b6c7ad354ac474944ba26b2895a59759, type: 3}
-  - {fileID: 138226, guid: edd4f3477fd5a8b4599bf6c0dac39f1d, type: 3}
-  - {fileID: 184594, guid: 1f7a3b3d104b8e44cb39f5356ae1d0bb, type: 3}
-  - {fileID: 125018, guid: 9d3e9c36668dcfe44b524760a4c3a3b5, type: 3}
+  - {fileID: 7697042587875160745, guid: a71fd906a2159e247ab4d632e46947db, type: 3}
+  - {fileID: -6181881731324206591, guid: 861e95a585868b643bf2e4a1d0ae63b7, type: 3}
+  - {fileID: 5554770417931398857, guid: b6c7ad354ac474944ba26b2895a59759, type: 3}
+  - {fileID: -9202965763133894951, guid: edd4f3477fd5a8b4599bf6c0dac39f1d, type: 3}
+  - {fileID: -3246902553460057899, guid: 1f7a3b3d104b8e44cb39f5356ae1d0bb, type: 3}
+  - {fileID: -1161943987898618981, guid: 9d3e9c36668dcfe44b524760a4c3a3b5, type: 3}
   _blackMaterial: {fileID: 2100000, guid: c59bfaef4bd993f49bffc5f1e993c16a, type: 2}
   _whiteMaterial: {fileID: 2100000, guid: 8e32135a4e65f104ebf164b6fcf3dd5d, type: 2}

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using JN.Utils;
 using UnityEngine;
@@ -7,23 +6,26 @@ namespace JN.Chess
 {
     public class PieceSpawner : MonoBehaviour
     {
-        [SerializeField] private List<GameObject> _listPiecePrefab;
+        [SerializeField] private List<Piece> _listPiecePrefab;
         [SerializeField] private Material _blackMaterial;
         [SerializeField] private Material _whiteMaterial;
 
-        private Dictionary<PieceType, GameObject> dictPiece;
-
+        private Dictionary<PieceType, ObjectPool<Piece>> _dictPiecePool;
+    
         public void Init()
         {
-            dictPiece = new Dictionary<PieceType, GameObject>();
+            _dictPiecePool = new Dictionary<PieceType, ObjectPool<Piece>>();
 
-            foreach(GameObject obj in _listPiecePrefab)
+            foreach(Piece obj in _listPiecePrefab)
             {
-                PieceType pieceType = obj.GetComponent<Piece>().pieceType;
+                PieceType pieceType = obj.pieceType;
+
+                ObjectPool<Piece> poolPiece = new ObjectPool<Piece>();
+                poolPiece.Init(pieceType.ToString(), obj.gameObject);
 
                 if(pieceType != PieceType.None)
                 {
-                    dictPiece.Add(pieceType, obj);
+                    _dictPiecePool.Add(pieceType, poolPiece);
                 }
                 else
                 {
@@ -32,17 +34,9 @@ namespace JN.Chess
             }    
         }
 
-        public GameObject Spawn(PieceType pieceType)
+        public Piece SpawnPiece(PieceType pieceType)
         {
-            GameObject prefab = dictPiece[pieceType];
-
-            if (prefab)
-            {
-                GameObject newPiece = Instantiate(prefab);
-                return newPiece;
-            }
-            
-            return null;
+            return _dictPiecePool[pieceType].GetNewObject();
         }
 
         public Material GetPieceMaterial(TeamColor pColor)

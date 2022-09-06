@@ -73,7 +73,8 @@ namespace JN.Chess
 
         private void CreatePieceAndInitialize(Vector2Int coords, TeamColor team, PieceType pieceType)
         {
-            Piece newPiece = pieceSpawner.Spawn(pieceType).GetComponent<Piece>();
+            Piece newPiece = pieceSpawner.SpawnPiece(pieceType);
+            newPiece.gameObject.SetActive(true);
             newPiece.SetData(coords, team, pieceType, boardGame);
 
             Material teamMaterial = pieceSpawner.GetPieceMaterial(team);
