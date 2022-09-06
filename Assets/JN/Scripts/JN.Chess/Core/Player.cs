@@ -3,11 +3,18 @@ using UnityEngine;
 
 namespace JN.Chess
 {
+    public enum PlayerType
+    {
+        Human,
+        AI,
+    }
+    
     [System.Serializable]
     public class Player
     {
         public TeamColor team;
         public BoardGame board;
+        public PlayerType playerType;
         public List<Piece> listActivePiece {get; private set;}
 
         public Player(TeamColor team, BoardGame board)

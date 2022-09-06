@@ -1,15 +1,27 @@
+using System.Collections.Generic;
 using System;
 using JN.Utils;
 using UnityEngine;
 
 namespace JN.Chess
 {
+    public enum GameMode
+    {
+        Player_Player,
+        Player_AI,
+        AI_AI
+    }
+
     public class ChessGameController : SingletonMonoBehaviour<ChessGameController>
     {
         public BoardGameData boardGameData;
         public BoardGame boardGame;
         public PieceSpawner pieceSpawner;
-        public event Action OnActivePlayerChanged;
+        public GameMode gameMode;
+
+        public event Action<Player> OnGameStart;
+        public event Action<Player> OnActivePlayerChanged;
+        public event Action OnGameOver;
 
         private Player whitePlayer;
         private Player blackPlayer;
@@ -18,20 +30,6 @@ namespace JN.Chess
         public void Init()
         {
             CreatePlayer();
-            StartNewGame();
-        }
-
-        private void StartNewGame()
-        {
-            pieceSpawner.Init();
-            LoadPieceFromData(boardGameData);
-            activePlayer = whitePlayer;
-            GeneratePossiblePlayerMoves(activePlayer);
-        }
-
-        private void GeneratePossiblePlayerMoves(Player player)
-        {
-            player.GeneratePossibleMoves();
         }
 
         private void CreatePlayer()
@@ -48,7 +46,12 @@ namespace JN.Chess
         private void ChangeActivePlayer()
         {
             activePlayer = activePlayer.team == TeamColor.White ? blackPlayer : whitePlayer;
-            OnActivePlayerChanged?.Invoke();
+            OnActivePlayerChanged?.Invoke(activePlayer);
+        }
+
+        private void GeneratePossiblePlayerMoves(Player player)
+        {
+            player.GeneratePossibleMoves();
         }
 
         private void LoadPieceFromData(BoardGameData broadData)
@@ -68,7 +71,7 @@ namespace JN.Chess
             }
         }
 
-        public void CreatePieceAndInitialize(Vector2Int coords, TeamColor team, PieceType pieceType)
+        private void CreatePieceAndInitialize(Vector2Int coords, TeamColor team, PieceType pieceType)
         {
             Piece newPiece = pieceSpawner.Spawn(pieceType).GetComponent<Piece>();
             newPiece.SetData(coords, team, pieceType, boardGame);
@@ -92,11 +95,59 @@ namespace JN.Chess
             return activePlayer.team;
         }
 
+        public void SelectGameMode(GameMode gMode)
+        {
+            gameMode = gMode;
+        }
+
+        public void SelectTeam (TeamColor type)
+        {
+            switch(type)
+            {
+                case TeamColor.White :
+                {
+                    whitePlayer.playerType = PlayerType.Human;
+                    blackPlayer.playerType = PlayerType.AI;
+                    break;
+                }
+                
+                case TeamColor.Black :
+                {
+                    whitePlayer.playerType = PlayerType.AI;
+                    blackPlayer.playerType = PlayerType.Human;
+                    break;
+                }
+            }
+        }
+
+        public void StartGame()
+        {
+            pieceSpawner.Init();
+            LoadPieceFromData(boardGameData);
+
+            activePlayer = whitePlayer;
+            GeneratePossiblePlayerMoves(activePlayer);
+
+            OnGameStart?.Invoke(activePlayer);
+        }
+
         public void EndTurn()
         {
             GeneratePossiblePlayerMoves(activePlayer);
             GeneratePossiblePlayerMoves(GetOpponent(activePlayer));
+
             ChangeActivePlayer();
+        }
+
+        public void EndGame()
+        {
+            ResetGame();
+        }
+
+        public void ResetGame()
+        {
+            whitePlayer.playerType = PlayerType.Human;
+            blackPlayer.playerType = PlayerType.Human;
         }
     }
 }
