@@ -10,8 +10,11 @@ namespace JN.Chess
     {
         [SerializeField] private Transform _bottomLeftSquareTransform;
         [SerializeField] private float _squareSize;
-        public const int BOARD_SIZE = 8;
+        [SerializeField] private SquareHighlightSpawner _highlightSpawner;
+
         public Transform pieceContainer;
+        public const int BOARD_SIZE = 8;
+
         private Piece[,] _grid;
         private Piece _selectedPiece;
 
@@ -27,12 +30,30 @@ namespace JN.Chess
 
         private void SelectPiece(Piece piece)
         {
+            DeselectPiece();
+            
             _selectedPiece = piece;
+
+            ShowMoveHighlight(piece.listOfAvaliableMoves);
+        }
+
+        private void ShowMoveHighlight(List<Vector2Int> listSquare)
+        {
+            Dictionary<Vector3, bool> dictMovePosition = new Dictionary<Vector3, bool>();
+            foreach(Vector2Int coords in listSquare)
+            {
+                Debug.Log("coord highlight " + CalculatePositionFromCoords(coords));
+                dictMovePosition.Add(CalculatePositionFromCoords(coords), GetPieceOnBoard(coords) ? false : true);
+            }
+
+            _highlightSpawner.ShowSelection(dictMovePosition);
         }
 
         private void DeselectPiece()
         {
             _selectedPiece = null;
+
+            _highlightSpawner.ClearSelection();
         }
 
         private void EndTurn()

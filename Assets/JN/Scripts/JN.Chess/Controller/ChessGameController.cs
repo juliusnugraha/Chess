@@ -9,6 +9,7 @@ namespace JN.Chess
         public BoardGameData boardGameData;
         public BoardGame boardGame;
         public PieceSpawner pieceSpawner;
+        public event Action OnActivePlayerChanged;
 
         private Player whitePlayer;
         private Player blackPlayer;
@@ -47,6 +48,7 @@ namespace JN.Chess
         private void ChangeActivePlayer()
         {
             activePlayer = activePlayer.team == TeamColor.White ? blackPlayer : whitePlayer;
+            OnActivePlayerChanged?.Invoke();
         }
 
         private void LoadPieceFromData(BoardGameData broadData)
@@ -83,6 +85,11 @@ namespace JN.Chess
         public bool IsCurrentActivePlayerTeam(TeamColor team)
         {
             return activePlayer.team == team;
+        }
+
+        public TeamColor ActiveTeam()
+        {
+            return activePlayer.team;
         }
 
         public void EndTurn()
