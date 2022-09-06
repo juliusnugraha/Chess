@@ -6,13 +6,13 @@ namespace JN.Chess
 {
     public class Queen : Piece
     {
-        public override List<Vector2Int> listOfAvailableMove()
+        public override List<Vector2Int> GenerateAvailableMove()
         {
-            avaliableMoves.Clear();
-
-            avaliableMoves.Add(coordinate + new Vector2Int(0,1));
-
-            return avaliableMoves;
+            listOfAvaliableMoves.Clear();
+            
+            listOfAvaliableMoves = MoveGenerator.GenerateMoveByDirection(coordinate, pieceType, board);
+            
+            return listOfAvaliableMoves;
         }
         
         public override void Move(Vector2Int coords)

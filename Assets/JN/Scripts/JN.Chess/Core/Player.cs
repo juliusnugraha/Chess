@@ -36,7 +36,7 @@ namespace JN.Chess
             foreach(Piece piece in listActivePiece)
             {
                 if(board.HasPiece(piece))
-                    piece.listOfAvailableMove();
+                    piece.GenerateAvailableMove();
             }
         }
 

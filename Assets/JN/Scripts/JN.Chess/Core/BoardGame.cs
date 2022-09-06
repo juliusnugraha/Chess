@@ -35,21 +35,12 @@ namespace JN.Chess
             _selectedPiece = null;
         }
 
-        private Piece GetPieceOnSquare(Vector2Int coords)
+        private void EndTurn()
         {
-            if(IsCoordinateOnBoard(coords))
-                return _grid[coords.x, coords.y];
-
-            return null;
+            ChessGameController.Instance.EndTurn();
         }
 
-        internal void SetPieceOnBoard(Vector2Int coords, Piece newPiece)
-        {
-            if(IsCoordinateOnBoard(coords))
-                _grid[coords.x, coords.y] = newPiece;
-        }
-
-        private bool IsCoordinateOnBoard(Vector2Int coords)
+        public bool IsCoordinateOnBoard(Vector2Int coords)
         {
             if(coords.x < 0 || coords.y < 0 || coords.x >= BOARD_SIZE || coords.y >= BOARD_SIZE)
                 return false;
@@ -57,9 +48,18 @@ namespace JN.Chess
             return true;
         }
 
-        private void EndTurn()
+        public Piece GetPieceOnBoard(Vector2Int coords)
         {
-            ChessGameController.Instance.EndTurn();
+            if(IsCoordinateOnBoard(coords))
+                return _grid[coords.x, coords.y];
+
+            return null;
+        }
+
+        public void SetPieceOnBoard(Vector2Int coords, Piece newPiece)
+        {
+            if(IsCoordinateOnBoard(coords))
+                _grid[coords.x, coords.y] = newPiece;
         }
 
         public Vector3 CalculatePositionFromCoords(Vector2Int coords)
@@ -77,7 +77,7 @@ namespace JN.Chess
         public void OnSquareSelected(Vector3 inputPosition)
         {
             Vector2Int coords = CalculateCoordsFromPosition(inputPosition);
-            Piece pieceTouched = GetPieceOnSquare(coords);
+            Piece pieceTouched = GetPieceOnBoard(coords);
 
             Debug.Log("piece coord " + coords);
 

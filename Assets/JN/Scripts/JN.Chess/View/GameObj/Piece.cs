@@ -12,13 +12,14 @@ namespace JN.Chess
         [SerializeField] private MaterialSetter materialSetter;
         [SerializeField] private InstantTweener tweener;
         public PieceType pieceType;
-
+        public List<Vector2Int> listOfAvaliableMoves;
+        
         public BoardGame board { protected get; set; }
         public Vector2Int coordinate { get; set; }
         public TeamColor team { get; set; }
         public bool hasMoved { get; private set; }
-        public List<Vector2Int> avaliableMoves;
-        public abstract List<Vector2Int> listOfAvailableMove();
+
+        public abstract List<Vector2Int> GenerateAvailableMove();
 
         public virtual void Move(Vector2Int coords)
         {
@@ -31,13 +32,8 @@ namespace JN.Chess
 
         virtual internal void Awake()
         {
-            avaliableMoves = new List<Vector2Int>();
+            listOfAvaliableMoves = new List<Vector2Int>();
             hasMoved = false;
-        }
-
-        protected void TryToAddMove(Vector2Int coords)
-        {
-            avaliableMoves.Add(coords);
         }
 
         public void SetMaterial(Material selectedMaterial)
@@ -45,14 +41,9 @@ namespace JN.Chess
             materialSetter.SetSingleMaterial(selectedMaterial);
         }
 
-        public bool IsFromSameTeam(Piece piece)
-        {
-            return team == piece.team;
-        }
-
         public bool CanMoveTo(Vector2Int coords)
         {
-            return avaliableMoves.Contains(coords);
+            return listOfAvaliableMoves.Contains(coords);
         }
         
         public void SetData(Vector2Int coords, TeamColor team, PieceType pieceType, BoardGame board)
@@ -69,7 +60,7 @@ namespace JN.Chess
 
         public bool IsAttackingPieceOfType<T>() where T : Piece
         {
-            foreach (var square in avaliableMoves)
+            foreach (var square in listOfAvaliableMoves)
             {
                 // if (board.GetPieceOnSquare(square) is T)
                 //     return true;
