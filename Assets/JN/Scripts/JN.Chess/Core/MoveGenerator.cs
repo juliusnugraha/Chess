@@ -6,8 +6,22 @@ namespace JN.Chess
 {
     public static class MoveGenerator
     {
-        public static Vector2Int[] crossDirections = new Vector2Int[] {Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right};
-        public static Vector2Int[] diagonalDirections = new Vector2Int[] {new Vector2Int (1,1), new Vector2Int (1,-1), new Vector2Int (-1,1), new Vector2Int (-1,-1)};
+        public static Vector2Int[] crossDirections = new Vector2Int[] 
+        {
+            Vector2Int.up, 
+            Vector2Int.down, 
+            Vector2Int.left, 
+            Vector2Int.right
+        };
+
+        public static Vector2Int[] diagonalDirections = new Vector2Int[] 
+        {
+            new Vector2Int (1,1), 
+            new Vector2Int (1,-1), 
+            new Vector2Int (-1,1), 
+            new Vector2Int (-1,-1)
+        };
+
         public static Vector2Int[] knightDirections = new Vector2Int[] 
         {
             new Vector2Int (1,2),
@@ -21,43 +35,50 @@ namespace JN.Chess
         };
 
 
-        public static List<Vector2Int> GenerateMoveByDirection(Vector2Int coords, PieceType pieceType, BoardGame board)
+        public static List<Vector2Int> GenerateMoveByDirection(Piece piece, BoardGame board)
         {
             List<Vector2Int> listMove = new List<Vector2Int>();
 
-            switch(pieceType)
+            switch(piece.pieceType)
             {
+                case PieceType.King:
+                    listMove = GeneratePointMove(piece, diagonalDirections.Concat(crossDirections).ToArray(), board);
+                break;
+
                 case PieceType.Knight:
-                    listMove = GenerateKnightMove(coords, knightDirections, board);
+                    listMove = GeneratePointMove(piece, knightDirections, board);
                 break;
 
                 case PieceType.Bishop:
-                    listMove = GenerateSlidingMove(coords, diagonalDirections, board);
+                    listMove = GenerateSlidingMove(piece, diagonalDirections, board);
                 break;
 
                 case PieceType.Rook:
-                    listMove = GenerateSlidingMove(coords, crossDirections, board);
+                    listMove = GenerateSlidingMove(piece, crossDirections, board);
                 break;
 
                 case PieceType.Queen:
-                    listMove = GenerateSlidingMove(coords, diagonalDirections.Concat(crossDirections).ToArray(), board);
+                    listMove = GenerateSlidingMove(piece, diagonalDirections.Concat(crossDirections).ToArray(), board);
                 break;
 
-                case PieceType.King:
-                    listMove = GenerateSlidingMove(coords, diagonalDirections.Concat(crossDirections).ToArray(), board);
-                break;
-
-                case PieceType.Pawn:
-                    listMove = GeneratePawnMove(coords, crossDirections, board);
-                break;
-
-                
             }
 
             return listMove;
         }
+        
+        private static List<Vector2Int> GeneratePointMove(Piece piece, Vector2Int[] directions, BoardGame board)
+        {
+            List<Vector2Int> listDirection = new List<Vector2Int>();
 
-        private static List<Vector2Int> CheckMoveCoordinate(List<Vector2Int> listCoords, BoardGame board)
+            foreach(Vector2Int direction in directions)
+            {
+                listDirection.Add(piece.coordinate + direction);
+            }
+
+            return CheckMoveCoordinate(piece, listDirection, board);
+        }
+
+        public static List<Vector2Int> CheckMoveCoordinate(Piece piece, List<Vector2Int> listCoords, BoardGame board)
         {
             List<Vector2Int> listMove = new List<Vector2Int>();
 
@@ -66,15 +87,15 @@ namespace JN.Chess
                 if(board.IsCoordinateOnBoard(nextCoords) == false)
                     continue;
 
-                Piece piece = board.GetPieceOnBoard(nextCoords);
-                if(piece == null)
+                Piece nextPiece = board.GetPieceOnBoard(nextCoords);
+                if(nextPiece == null)
                 {
                     listMove.Add(nextCoords);
                     continue;
                 }
                 else
                 {
-                    if(ChessGameController.Instance.IsCurrentActivePlayerTeam(piece.team))
+                    if(piece.team == nextPiece.team)
                     {
                         continue;
                     }
@@ -88,32 +109,8 @@ namespace JN.Chess
 
             return listMove;
         }
-        
-        private static List<Vector2Int> GenerateKnightMove(Vector2Int coords, Vector2Int[] directions, BoardGame board)
-        {
-            List<Vector2Int> listCoords = new List<Vector2Int>();
 
-            foreach(Vector2Int direction in directions)
-            {
-                listCoords.Add(coords + direction);
-            }
-
-            return CheckMoveCoordinate(listCoords, board);
-        }
-
-        private static List<Vector2Int> GeneratePawnMove(Vector2Int coords, Vector2Int[] directions, BoardGame board)
-        {
-            List<Vector2Int> listCoords = new List<Vector2Int>();
-
-            foreach(Vector2Int direction in directions)
-            {
-                listCoords.Add(coords + direction);
-            }
-
-            return CheckMoveCoordinate(listCoords, board);
-        }
-
-        private static List<Vector2Int> GenerateSlidingMove(Vector2Int coords, Vector2Int[] directions, BoardGame board)
+        private static List<Vector2Int> GenerateSlidingMove(Piece piece, Vector2Int[] directions, BoardGame board)
         {
             List<Vector2Int> listMove = new List<Vector2Int>();
 
@@ -122,12 +119,12 @@ namespace JN.Chess
                 int i = 1;
                 while (true)
                 {
-                    Vector2Int nextCoords = coords + direction * i;
+                    Vector2Int nextCoords = piece.coordinate + direction * i;
                     if(board.IsCoordinateOnBoard(nextCoords) == false)
                         break;
 
-                    Piece piece = board.GetPieceOnBoard(nextCoords);
-                    if(piece == null)
+                    Piece nextPiece = board.GetPieceOnBoard(nextCoords);
+                    if(nextPiece == null)
                     {
                         listMove.Add(nextCoords);
                         i++;
@@ -135,7 +132,7 @@ namespace JN.Chess
                     }
                     else
                     {
-                        if(ChessGameController.Instance.IsCurrentActivePlayerTeam(piece.team))
+                        if(piece.team == nextPiece.team)
                         {
                             break;
                         }

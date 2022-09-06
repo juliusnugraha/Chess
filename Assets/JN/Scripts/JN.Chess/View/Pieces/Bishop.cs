@@ -10,7 +10,7 @@ namespace JN.Chess
         {
             listOfAvaliableMoves.Clear();
 
-            listOfAvaliableMoves = MoveGenerator.GenerateMoveByDirection(coordinate, pieceType, board);
+            listOfAvaliableMoves = MoveGenerator.GenerateMoveByDirection(this, board);
 
             return listOfAvaliableMoves;
         }
