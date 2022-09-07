@@ -15,6 +15,8 @@ namespace JN.Chess
         public GameObject panelGameMode;
         public GameObject panelSelectTeam;
         public GameObject panelGameOver;
+        public GameObject CameraWhite;
+        public GameObject CameraBlack;
 
         void Awake()
         {
@@ -43,6 +45,9 @@ namespace JN.Chess
 
         void Start()
         {
+            CameraWhite.SetActive(true);
+            CameraBlack.SetActive(false);
+
             HideAllPanel();
             panelGameMode.SetActive(true);
         }
@@ -61,7 +66,7 @@ namespace JN.Chess
 
         private void OnGameOver()
         {
-
+            panelGameOver.SetActive(true);
         }
 
         private void OnActivePlayerChanged(Player activePlayer)
@@ -95,6 +100,7 @@ namespace JN.Chess
             }
             else
             {
+                ChessGameController.Instance.SelectTeam(TeamColor.Both);
                 ChessGameController.Instance.StartGame();
             }
         }
@@ -102,11 +108,20 @@ namespace JN.Chess
         public void SelectTeam(int val)
         {
             TeamColor team = (TeamColor)val;
+
+            CameraWhite.SetActive(team == TeamColor.White ? true : false);
+            CameraBlack.SetActive(team == TeamColor.Black ? true : false);
             
             ChessGameController.Instance.SelectTeam(team);
             panelSelectTeam.SetActive(false);
             
             ChessGameController.Instance.StartGame();
+        }
+
+        public void RestartGame()
+        {
+            ChessGameController.Instance.ResetGame();
+            Start();
         }
     }
 }

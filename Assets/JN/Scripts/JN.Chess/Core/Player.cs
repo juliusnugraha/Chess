@@ -1,5 +1,8 @@
+using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace JN.Chess
 {
@@ -22,6 +25,8 @@ namespace JN.Chess
             listActivePiece = new List<Piece>();
             this.board = board;
             this.team = team;
+
+            ChessGameController.Instance.OnActivePlayerChanged += OnActivePlayerChanged;
         }
 
         public void AddPiece(Piece piece)
@@ -45,6 +50,20 @@ namespace JN.Chess
                 if(board.HasPiece(piece))
                     piece.GenerateAvailableMove();
             }
+        }
+
+        private void OnActivePlayerChanged(Player player)
+        {
+            if(player != this)
+                return;
+
+            if(playerType == PlayerType.AI)
+                ChessGameController.Instance.CalculateAIMove();
+        }
+
+        public Piece[] GetPieceOfType<T>() where T : Piece
+        {
+            return listActivePiece.Where(x=>x is T).ToArray();
         }
 
         void LogError (object message)

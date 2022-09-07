@@ -10,7 +10,7 @@ namespace JN.Utils
         GameObject original;
         protected Transform parent;
 
-        public void Init(string ObjectName, GameObject Original, Transform Parent = null, int InitialCount = 0)
+        public void Init(string ObjectName, GameObject Original, Transform Parent = null, int InitialCount = 2)
         {
             list = new List<T>();
             original = Original;

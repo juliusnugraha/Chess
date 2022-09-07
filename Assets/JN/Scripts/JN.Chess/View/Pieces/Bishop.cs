@@ -8,11 +8,11 @@ namespace JN.Chess
     {
         public override List<Vector2Int> GenerateAvailableMove()
         {
-            listOfAvaliableMoves.Clear();
+            listOfAvailableMoves.Clear();
 
-            listOfAvaliableMoves = MoveGenerator.GenerateMoveByDirection(this, board);
+            listOfAvailableMoves = MoveGenerator.GenerateMoveByDirection(this, board);
 
-            return listOfAvaliableMoves;
+            return listOfAvailableMoves;
         }
         
         public override void Move(Vector2Int coords)

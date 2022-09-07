@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using System;
 using JN.Utils;
@@ -12,12 +14,21 @@ namespace JN.Chess
         AI_AI
     }
 
+    public enum GameState
+    {
+        Init,
+        HumanTurn,
+        AITurn,
+        Finished,
+    }
+
     public class ChessGameController : SingletonMonoBehaviour<ChessGameController>
     {
         public BoardGameData boardGameData;
         public BoardGame boardGame;
         public PieceSpawner pieceSpawner;
         public GameMode gameMode;
+        public GameState gameState;
 
         public event Action<Player> OnGameStart;
         public event Action<Player> OnActivePlayerChanged;
@@ -29,7 +40,9 @@ namespace JN.Chess
 
         public void Init()
         {
+            SetState(GameState.Init);
             CreatePlayer();
+            pieceSpawner.Init();
         }
 
         private void CreatePlayer()
@@ -46,6 +59,16 @@ namespace JN.Chess
         private void ChangeActivePlayer()
         {
             activePlayer = activePlayer.team == TeamColor.White ? blackPlayer : whitePlayer;
+            UpdatePlayerTurn();
+        }
+
+        private void UpdatePlayerTurn()
+        {
+            if(activePlayer.playerType == PlayerType.Human)
+                SetState(GameState.HumanTurn);
+            else
+                SetState(GameState.AITurn);
+
             OnActivePlayerChanged?.Invoke(activePlayer);
         }
 
@@ -54,18 +77,18 @@ namespace JN.Chess
             player.GeneratePossibleMoves();
         }
 
-        private void LoadPieceFromData(BoardGameData broadData)
+        private void LoadPieceFromData(BoardGameData boardData)
         {
-            if (broadData is null)
+            if (boardData is null)
             {
-                throw new ArgumentNullException(nameof(broadData));
+                throw new ArgumentNullException(nameof(boardData));
             }
 
             for (int i = 0; i < boardGameData.GetPieceCount(); i++)
             {
-                Vector2Int coordinate = broadData.GetPieceCoordinateAtIndex(i);
-                TeamColor teamColor = broadData.GetPieceTeamColorAtIndex(i);
-                PieceType pieceType = broadData.GetPieceTypeAtIndex(i);
+                Vector2Int coordinate = boardData.GetPieceCoordinateAtIndex(i);
+                TeamColor teamColor = boardData.GetPieceTeamColorAtIndex(i);
+                PieceType pieceType = boardData.GetPieceTypeAtIndex(i);
 
                 CreatePieceAndInitialize(coordinate, teamColor, pieceType);
             }
@@ -84,6 +107,50 @@ namespace JN.Chess
 
             Player currentPlayer = team == TeamColor.White ? whitePlayer : blackPlayer;
             currentPlayer.AddPiece(newPiece);
+        }
+
+        public void OnPieceRemoved(Piece piece)
+        {
+            Player pieceOwner = (piece.team == TeamColor.White) ? whitePlayer : blackPlayer;
+            pieceOwner.RemovePiece(piece);
+        }
+
+        public void CalculateAIMove()
+        {
+            StartCoroutine(CalculateAIRandomMove());
+        }
+
+        public IEnumerator CalculateAIRandomMove() 
+        {
+            List<Piece> listMoveablePiece = new List<Piece>();
+            foreach(Piece moveablePiece in activePlayer.listActivePiece)
+            {
+                if(moveablePiece.listOfAvailableMoves.Count > 0)
+                {
+                    listMoveablePiece.Add(moveablePiece);
+                }
+            }
+
+            int indexPiece = UnityEngine.Random.Range(0, listMoveablePiece.Count);
+            Piece piece = listMoveablePiece[indexPiece];
+            
+            int indexMove = UnityEngine.Random.Range(0, piece.listOfAvailableMoves.Count-1);
+            Vector2Int coords = piece.listOfAvailableMoves[indexMove];
+
+            StartCoroutine(boardGame.OnMovePiece(coords, piece));
+
+            yield return null;
+        }
+
+        private bool IsTheKingCheckMate()
+        {
+            Player opponent = GetOpponent(activePlayer);
+            Piece king = opponent.GetPieceOfType<King>().FirstOrDefault();
+
+            if(king == null)
+                return true;
+
+            return false;
         }
 
         public bool IsCurrentActivePlayerTeam(TeamColor team)
@@ -118,16 +185,37 @@ namespace JN.Chess
                     blackPlayer.playerType = PlayerType.Human;
                     break;
                 }
+
+                case TeamColor.None :
+                {
+                    whitePlayer.playerType = PlayerType.AI;
+                    blackPlayer.playerType = PlayerType.AI;
+
+                    break;
+                }
+
+                case TeamColor.Both :
+                {
+                    whitePlayer.playerType = PlayerType.Human;
+                    blackPlayer.playerType = PlayerType.Human;
+
+                    break;
+                }
             }
+        }
+
+        public void SetState(GameState state)
+        {
+            gameState = state;
         }
 
         public void StartGame()
         {
-            pieceSpawner.Init();
             LoadPieceFromData(boardGameData);
 
             activePlayer = whitePlayer;
             GeneratePossiblePlayerMoves(activePlayer);
+            UpdatePlayerTurn();
 
             OnGameStart?.Invoke(activePlayer);
         }
@@ -137,18 +225,21 @@ namespace JN.Chess
             GeneratePossiblePlayerMoves(activePlayer);
             GeneratePossiblePlayerMoves(GetOpponent(activePlayer));
 
-            ChangeActivePlayer();
+            if(IsTheKingCheckMate())
+                EndGame();
+            else
+                ChangeActivePlayer();
         }
 
         public void EndGame()
         {
-            ResetGame();
+            SetState(GameState.Finished);
+            OnGameOver?.Invoke();
         }
 
         public void ResetGame()
         {
-            whitePlayer.playerType = PlayerType.Human;
-            blackPlayer.playerType = PlayerType.Human;
+            boardGame.ResetBoard();
         }
     }
 }

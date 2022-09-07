@@ -1,3 +1,4 @@
+using System.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +32,12 @@ namespace JN.Chess
         private void SelectPiece(Piece piece)
         {
             DeselectPiece();
-            
+
             _selectedPiece = piece;
 
-            ShowMoveHighlight(piece.listOfAvaliableMoves);
+            Debug.Log("coord highlight " + piece);
+
+            ShowMoveHighlight(piece.listOfAvailableMoves);
         }
 
         private void ShowMoveHighlight(List<Vector2Int> listSquare)
@@ -83,6 +86,17 @@ namespace JN.Chess
                 _grid[coords.x, coords.y] = newPiece;
         }
 
+        public void RemovePieceOnBoard(Piece piece)
+        {
+            if(HasPiece(piece))
+            {
+                ChessGameController.Instance.OnPieceRemoved(piece);
+
+                _grid[piece.coordinate.x, piece.coordinate.y] = null;
+                piece.gameObject.SetActive(false);
+            }
+        }
+
         public Vector3 CalculatePositionFromCoords(Vector2Int coords)
         {
             return _bottomLeftSquareTransform.position + new Vector3(coords.x * _squareSize, 0f, coords.y * _squareSize);
@@ -97,6 +111,9 @@ namespace JN.Chess
 
         public void OnSquareSelected(Vector3 inputPosition)
         {
+            if(ChessGameController.Instance.gameState != GameState.HumanTurn)
+                return;
+
             Vector2Int coords = CalculateCoordsFromPosition(inputPosition);
             Piece pieceTouched = GetPieceOnBoard(coords);
 
@@ -118,13 +135,20 @@ namespace JN.Chess
                         {
                             SelectPiece(pieceTouched);
                         }
+                        else
+                        {
+                            if(_selectedPiece.CanMoveTo(coords))
+                            {
+                                StartCoroutine(OnMovePiece(coords, _selectedPiece));
+                            }
+                        }
                     }
                 }
                 else
                 {
                     if(_selectedPiece.CanMoveTo(coords))
                     {
-                        OnMovePiece(coords, _selectedPiece);
+                        StartCoroutine(OnMovePiece(coords, _selectedPiece));
                     }
                 }
             }
@@ -143,10 +167,17 @@ namespace JN.Chess
             }
         }
 
-        public void OnMovePiece(Vector2Int coords, Piece piece)
+        public IEnumerator OnMovePiece(Vector2Int coords, Piece piece)
         {
+            Piece target = GetPieceOnBoard(coords);
+            if(target)
+                RemovePieceOnBoard(target);
+
             UpdateBoardOnMovePiece(coords, piece.coordinate, piece, null);
-            _selectedPiece.Move(coords);
+            piece.Move(coords);
+
+            yield return new WaitForSeconds(0.5f);
+
             DeselectPiece();
             EndTurn();
         }
@@ -159,6 +190,9 @@ namespace JN.Chess
 
         public bool HasPiece(Piece piece)
         {
+            if(piece == null)
+                return false;
+                
             for (int i = 0; i < BOARD_SIZE; i++)
             {
                 for (int j = 0; j < BOARD_SIZE; j++)
@@ -170,5 +204,18 @@ namespace JN.Chess
 
             return false;
         }
+
+        public void ResetBoard()
+        {
+            for (int i = 0; i < BOARD_SIZE; i++)
+            {
+                for (int j = 0; j < BOARD_SIZE; j++)
+                {
+                    Piece piece = GetPieceOnBoard(new Vector2Int(i, j));
+                    RemovePieceOnBoard(piece);
+                }
+            }
+        }
+        
     }
 }
