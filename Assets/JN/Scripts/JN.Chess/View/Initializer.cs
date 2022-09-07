@@ -12,6 +12,7 @@ namespace JN.Chess
         public BoardGame boardGame;
         public PieceSpawner pieceSpawner;
         public TextMeshProUGUI textTurn;
+        public TextMeshProUGUI textGameOver;
         public GameObject panelGameMode;
         public GameObject panelSelectTeam;
         public GameObject panelGameOver;
@@ -64,8 +65,9 @@ namespace JN.Chess
             OnActivePlayerChanged(activePlayer);
         }
 
-        private void OnGameOver()
+        private void OnGameOver(Player activePlayer)
         {
+            textGameOver.text = "Player " + activePlayer.team.ToString() + " won!";
             panelGameOver.SetActive(true);
         }
 
@@ -86,6 +88,12 @@ namespace JN.Chess
             }
 
             textTurn.text = message;
+
+            if(ChessGameController.Instance.gameMode == GameMode.Player_Player)
+            {
+                CameraBlack.SetActive(activePlayer.team == TeamColor.Black ? true : false);
+                CameraWhite.SetActive(activePlayer.team == TeamColor.White ? true : false);
+            }
         }
 
         public void SelectGameMode(int val)

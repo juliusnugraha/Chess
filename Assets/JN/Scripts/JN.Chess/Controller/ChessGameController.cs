@@ -32,7 +32,7 @@ namespace JN.Chess
 
         public event Action<Player> OnGameStart;
         public event Action<Player> OnActivePlayerChanged;
-        public event Action OnGameOver;
+        public event Action<Player> OnGameOver;
 
         private Player whitePlayer;
         private Player blackPlayer;
@@ -234,7 +234,7 @@ namespace JN.Chess
         public void EndGame()
         {
             SetState(GameState.Finished);
-            OnGameOver?.Invoke();
+            OnGameOver?.Invoke(activePlayer);
         }
 
         public void ResetGame()
