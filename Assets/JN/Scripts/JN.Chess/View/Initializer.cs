@@ -16,6 +16,7 @@ namespace JN.Chess
         public GameObject panelGameMode;
         public GameObject panelSelectTeam;
         public GameObject panelGameOver;
+        public GameObject buttonReset;
         public GameObject CameraWhite;
         public GameObject CameraBlack;
 
@@ -46,6 +47,7 @@ namespace JN.Chess
 
         void Start()
         {
+            textTurn.text = "Chess 3D";
             CameraWhite.SetActive(true);
             CameraBlack.SetActive(false);
 
@@ -58,11 +60,13 @@ namespace JN.Chess
             panelGameMode.SetActive(false);
             panelSelectTeam.SetActive(false);
             panelGameOver.SetActive(false);
+            buttonReset.SetActive(false);
         }
 
         private void OnGameStart(Player activePlayer)
         {
             OnActivePlayerChanged(activePlayer);
+            buttonReset.SetActive(true);
         }
 
         private void OnGameOver(Player activePlayer)
@@ -138,6 +142,11 @@ namespace JN.Chess
         {
             ChessGameController.Instance.ResetGame();
             Start();
+        }
+
+        public void QuitGame()
+        {
+            Application.Quit();
         }
     }
 }

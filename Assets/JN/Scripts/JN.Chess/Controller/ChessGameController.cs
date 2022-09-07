@@ -239,6 +239,7 @@ namespace JN.Chess
 
         public void ResetGame()
         {
+            EndGame();
             boardGame.ResetBoard();
         }
     }
