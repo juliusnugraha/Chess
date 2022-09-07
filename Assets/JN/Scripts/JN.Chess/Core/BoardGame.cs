@@ -86,6 +86,35 @@ namespace JN.Chess
                 _grid[coords.x, coords.y] = newPiece;
         }
 
+        public Piece GetPieceInDirection<T>(Vector2Int coords, TeamColor team, Vector2Int direction)
+        {
+            int i = 1;
+            while(true)
+            {
+                Vector2Int nextCoords = coords + direction * i;
+                if (IsCoordinateOnBoard(nextCoords) == false)
+                    return null;
+
+                Piece piece = GetPieceOnBoard(nextCoords);
+
+                if (piece != null)
+                {
+                    Debug.Log("juju " + piece + " " + piece.team);
+
+                    if (piece.team != team || !(piece is T))
+                    {
+                        return null;
+                    }
+                    else if (piece.team == team && piece is T)
+                    {
+                        return piece;
+                    }
+                }
+
+                i++;
+            }
+        }
+
         public void RemovePieceOnBoard(Piece piece)
         {
             if(HasPiece(piece))
@@ -176,10 +205,16 @@ namespace JN.Chess
             UpdateBoardOnMovePiece(coords, piece.coordinate, piece, null);
             piece.Move(coords);
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
 
             DeselectPiece();
             EndTurn();
+        }
+
+        public void PromotePiece(Piece piece)
+        {
+            RemovePieceOnBoard(piece);
+            ChessGameController.Instance.CreatePieceAndInitialize(piece.coordinate, piece.team, PieceType.Queen);
         }
 
         public void UpdateBoardOnMovePiece(Vector2Int newCoords, Vector2Int oldCoords, Piece newPiece, Piece oldPiece)

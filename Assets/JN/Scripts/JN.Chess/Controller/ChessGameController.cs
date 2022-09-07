@@ -94,7 +94,7 @@ namespace JN.Chess
             }
         }
 
-        private void CreatePieceAndInitialize(Vector2Int coords, TeamColor team, PieceType pieceType)
+        public void CreatePieceAndInitialize(Vector2Int coords, TeamColor team, PieceType pieceType)
         {
             Piece newPiece = pieceSpawner.SpawnPiece(pieceType);
             newPiece.gameObject.SetActive(true);

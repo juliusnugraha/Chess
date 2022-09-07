@@ -14,12 +14,13 @@ GameObject:
   - component: {fileID: 102106383195178807}
   - component: {fileID: 7879204215574538799}
   - component: {fileID: 7697042587875160745}
+  - component: {fileID: 2260634793639248258}
   m_Layer: 0
   m_Name: Bishop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &470440
 Transform:
@@ -124,4 +125,18 @@ MonoBehaviour:
   materialSetter: {fileID: 102106383195178807}
   tweener: {fileID: 7879204215574538799}
   pieceType: 2
-  avaliableMoves: []
+  listOfAvailableMoves: []
+--- !u!64 &2260634793639248258
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196866}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: 66ad00b166b914e47acce78daea25aa6, type: 3}

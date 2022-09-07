@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 1
   m_IsActive: 1
 --- !u!4 &411790
 Transform:
@@ -124,4 +124,4 @@ MonoBehaviour:
   materialSetter: {fileID: -6116471092668603157}
   tweener: {fileID: 7580255121260646472}
   pieceType: 4
-  avaliableMoves: []
+  listOfAvailableMoves: []

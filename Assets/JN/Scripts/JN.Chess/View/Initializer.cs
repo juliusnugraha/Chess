@@ -94,14 +94,22 @@ namespace JN.Chess
 
             ChessGameController.Instance.SelectGameMode(gMode);
             panelGameMode.SetActive(false);
-            if(gMode == GameMode.Player_AI)
+
+            switch(gMode)
             {
-                panelSelectTeam.SetActive(true);
-            }
-            else
-            {
-                ChessGameController.Instance.SelectTeam(TeamColor.Both);
-                ChessGameController.Instance.StartGame();
+                case GameMode.Player_AI:
+                    panelSelectTeam.SetActive(true);
+                    break;
+
+                case GameMode.Player_Player:
+                    ChessGameController.Instance.SelectTeam(TeamColor.Both);
+                    ChessGameController.Instance.StartGame();
+                    break;
+
+                case GameMode.AI_AI:
+                    ChessGameController.Instance.SelectTeam(TeamColor.None);
+                    ChessGameController.Instance.StartGame();
+                    break;
             }
         }
 

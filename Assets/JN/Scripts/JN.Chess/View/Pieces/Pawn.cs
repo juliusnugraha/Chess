@@ -16,7 +16,11 @@ namespace JN.Chess
 
             for (int i = 1; i <= range; i++)
             {
-                listOfPossibleMove.Add(coordinate + direction * i);
+                Vector2Int moveCoords = coordinate + direction * i;
+                if(board.GetPieceOnBoard(moveCoords) == null)
+                    listOfPossibleMove.Add(moveCoords);
+                else
+                    break;
             }
 
             // take opponent direction
@@ -47,7 +51,17 @@ namespace JN.Chess
         public override void Move(Vector2Int coords)
         {
             base.Move(coords);
+            CheckPromotion();
         }
+
+        private void CheckPromotion()
+    {
+        int endOfBoardYCoord = team == TeamColor.White ? BoardGame.BOARD_SIZE - 1 : 0;
+        if (coordinate.y == endOfBoardYCoord)
+        {
+            board.PromotePiece(this);
+        }
+    }
     }
 
 }
